@@ -1,6 +1,8 @@
 package system
 
 import (
+	"strings"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	common "github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
@@ -8,7 +10,6 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strings"
 )
 
 type AutoCodePackageApi struct{}
@@ -19,7 +20,7 @@ type AutoCodePackageApi struct{}
 // @Security  ApiKeyAuth
 // @accept    application/json
 // @Produce   application/json
-// @Param     data  body      system.SysAutoCode                                         true  "创建package"
+// @Param     data  body      request.SysAutoCodePackageCreate                                        true  "创建package"
 // @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "创建package成功"
 // @Router    /autoCode/createPackage [post]
 func (a *AutoCodePackageApi) Create(c *gin.Context) {
@@ -48,7 +49,7 @@ func (a *AutoCodePackageApi) Create(c *gin.Context) {
 // @Security  ApiKeyAuth
 // @accept    application/json
 // @Produce   application/json
-// @Param     data  body      system.SysAutoCode                                         true  "创建package"
+// @Param     data  body      common.GetById                                         true  "创建package"
 // @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "删除package成功"
 // @Router    /autoCode/delPackage [post]
 func (a *AutoCodePackageApi) Delete(c *gin.Context) {

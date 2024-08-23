@@ -79,6 +79,7 @@ func Routers() *gin.Engine {
 		businessRouter.InitWebsiteRouter(PublicGroup)
 		businessRouter.InitWebsiteCategoryRouter(PublicGroup)
 		businessRouter.InitModeRouter(PublicGroup)
+		businessRouter.InitBaseRouter(PublicGroup)
 	}
 
 	{

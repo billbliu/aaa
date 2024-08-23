@@ -1,8 +1,11 @@
 package business
 
 import (
+	"errors"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/golang-module/carbon/v2"
+	"gorm.io/gorm"
 )
 
 type BusCustomer struct {
@@ -20,6 +23,28 @@ type BusCustomer struct {
 
 var BusCustomerDao = new(BusCustomer)
 
-func (p *BusCustomer) TableName() string {
+func (t *BusCustomer) TableName() string {
 	return "bus_customer"
+}
+
+func (t *BusCustomer) GetCustomerByPhone(db *gorm.DB, phone string) (*BusCustomer, error) {
+	customer := BusCustomer{}
+	if err := db.Table(t.TableName()).Where("phone = ?", phone).First(&customer).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &customer, nil
+}
+
+func (t *BusCustomer) GetCustomerByEmail(db *gorm.DB, email string) (*BusCustomer, error) {
+	customer := BusCustomer{}
+	if err := db.Table(t.TableName()).Where("email = ?", email).First(&customer).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &customer, nil
 }

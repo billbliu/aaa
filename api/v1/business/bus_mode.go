@@ -245,6 +245,7 @@ func (s *BusModeApi) ModeBindingCategoryWebsites(c *gin.Context) {
 // @Security  ApiKeyAuth
 // @accept    application/json
 // @Produce   application/json
+// @Param     data  body      request.GetById                 true  "ID"
 // @Success   200  {object}  response.Response{data=[]business.BusMode,msg=string}  " 获取模式已绑定分类、网站"
 // @Router    /mode/getModeBindingWebsites [get]
 func (s *BusModeApi) GetModeBindingCategoryWebsites(c *gin.Context) {

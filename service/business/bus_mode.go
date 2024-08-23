@@ -114,9 +114,34 @@ func (apiService *ModeService) GetModeBindingCategoryWebsites(id int) (res busin
 
 	busModeCategoryWebsiteList := []business.BusModeCategoryWebsite{}
 	global.GVA_DB.Model(&business.BusModeCategoryWebsite{}).Where("bus_mode_id = ?", id).Find(&busModeCategoryWebsiteList)
-	// maps := make(map[uint][]uint, 0)
-	// for _, busModeCategoryWebsite := range busModeCategoryWebsiteList {
+	maps := make(map[uint][]uint, 0)
+	for _, busModeCategoryWebsite := range busModeCategoryWebsiteList {
+		// 检查 key 是否已经存在
+		if _, exists := maps[busModeCategoryWebsite.BusWebsiteCategoryID]; !exists {
+			// 如果不存在，初始化一个空的 []uint 切片
+			maps[busModeCategoryWebsite.BusWebsiteCategoryID] = []uint{}
+		}
 
-	// }
+		// 将新元素追加到切片中
+		maps[busModeCategoryWebsite.BusWebsiteCategoryID] = append(maps[busModeCategoryWebsite.BusWebsiteCategoryID], busModeCategoryWebsite.BusWebsiteID)
+	}
+
+	categoryList := []businessRes.ModeCategoryWebsitesList{}
+	for categoryID, websiteIDs := range maps {
+		category, err := business.BusWebsiteCategoryDao.GetBusWebsiteCategoryById(global.GVA_DB, categoryID)
+		if err != nil {
+			global.GVA_LOG.Error(err.Error())
+		}
+
+		websites, err := business.BusWebsiteDao.GetBusWebsitesByIds(global.GVA_DB, websiteIDs)
+		if err != nil {
+			global.GVA_LOG.Error(err.Error())
+		}
+
+		categoryList = append(categoryList, businessRes.ModeCategoryWebsitesList{
+			Category:    *category,
+			WebsiteList: *websites,
+		})
+	}
 	return
 }

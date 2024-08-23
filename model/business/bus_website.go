@@ -36,3 +36,14 @@ func (t *BusWebsite) GetBusWebsiteById(db *gorm.DB, id uint) (*BusWebsite, error
 	}
 	return &busWebsite, nil
 }
+
+func (t *BusWebsite) GetBusWebsitesByIds(db *gorm.DB, ids []uint) (*[]BusWebsite, error) {
+	busWebsites := []BusWebsite{}
+	if err := db.Table(t.TableName()).Where("id IN (?)", ids).Find(&busWebsites).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("record not found")
+		}
+		return nil, err
+	}
+	return &busWebsites, nil
+}

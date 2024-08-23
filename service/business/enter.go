@@ -4,4 +4,5 @@ type ServiceGroup struct {
 	WebsiteService
 	WebsiteCategoryService
 	ModeService
+	BaseService
 }

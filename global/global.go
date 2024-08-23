@@ -1,9 +1,11 @@
 package global
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/qiniu/qmgo"
 	"sync"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jordan-wright/email"
+	"github.com/qiniu/qmgo"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/utils/timer"
 	"github.com/songzhibin97/gkit/cache/local_cache"
@@ -33,6 +35,8 @@ var (
 	GVA_ROUTERS             gin.RoutesInfo
 	BlackCache              local_cache.Cache
 	lock                    sync.RWMutex
+
+	EmailPool *email.Pool
 )
 
 // GetGlobalDBByDBName 通过名称获取db list中的db
@@ -52,3 +56,18 @@ func MustGetGlobalDBByDBName(dbname string) *gorm.DB {
 	}
 	return db
 }
+
+const (
+	SmsCodeTimeOut      = 600
+	SmsCodeSendInterval = 60
+)
+
+const (
+	ENV_PORT = "prod"
+)
+
+// 验证码验证类型
+const (
+	SmsCodeLoginRegister = "login_register" //登录注册获取验证码
+	SmsCodeForgot        = "forgot_passwd"  //忘记密码获取验证码
+)

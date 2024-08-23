@@ -1761,6 +1761,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/base/GetPhoneSMS": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BusBaseApi"
+                ],
+                "summary": "获取手机验证码",
+                "parameters": [
+                    {
+                        "description": "手机和验证码类型",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetPhoneSMSReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取手机验证码",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.GetSMSRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/base/captcha": {
             "post": {
                 "security": [
@@ -1803,6 +1853,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/base/getEmailSMS": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BusBaseApi"
+                ],
+                "summary": "获取邮箱验证码",
+                "parameters": [
+                    {
+                        "description": "邮箱和验证码类型",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetEmailSMSReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取邮箱验证码",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.GetSMSRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/base/login": {
             "post": {
                 "produces": [
@@ -1835,10 +1935,110 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/response.LoginResponse"
+                                            "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_system_response.LoginResponse"
                                         },
                                         "msg": {
                                             "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/base/loginOrRegisterByEmailSMS": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BusBaseApi"
+                ],
+                "summary": "通过邮箱登录或注册",
+                "parameters": [
+                    {
+                        "description": "邮箱验证码参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.LoginOrRegisterByEmailSMSReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "通过邮箱登录或注册",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CheckSMSRes"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/base/loginOrRegisterByPhoneSMS": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BusBaseApi"
+                ],
+                "summary": "通过手机登录或注册",
+                "parameters": [
+                    {
+                        "description": "手机验证码",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.LoginOrRegisterByPhoneSMSReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "检查手机验证码",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CheckSMSRes"
                                         }
                                     }
                                 }
@@ -3838,6 +4038,17 @@ const docTemplate = `{
                     "BusModeApi"
                 ],
                 "summary": "获取模式已绑定分类、网站",
+                "parameters": [
+                    {
+                        "description": "ID",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GetById"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": " 获取模式已绑定分类、网站",
@@ -7107,6 +7318,26 @@ const docTemplate = `{
                 }
             }
         },
+        "config.EmailConfig": {
+            "type": "object",
+            "properties": {
+                "max-client": {
+                    "type": "integer"
+                },
+                "smtp-email": {
+                    "type": "string"
+                },
+                "smtp-host": {
+                    "type": "string"
+                },
+                "smtp-password": {
+                    "type": "string"
+                },
+                "smtp-port": {
+                    "type": "string"
+                }
+            }
+        },
         "config.Excel": {
             "type": "object",
             "properties": {
@@ -7577,6 +7808,9 @@ const docTemplate = `{
                 "email": {
                     "$ref": "#/definitions/github_com_flipped-aurora_gin-vue-admin_server_config.Email"
                 },
+                "emailconfig": {
+                    "$ref": "#/definitions/config.EmailConfig"
+                },
                 "excel": {
                     "$ref": "#/definitions/config.Excel"
                 },
@@ -7768,6 +8002,9 @@ const docTemplate = `{
                 },
                 "db-type": {
                     "description": "数据库类型:mysql(默认)|sqlite|sqlserver|postgresql",
+                    "type": "string"
+                },
+                "env": {
                     "type": "string"
                 },
                 "iplimit-count": {
@@ -8032,6 +8269,20 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_flipped-aurora_gin-vue-admin_server_model_system_response.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "expiresAt": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/system.SysUser"
+                }
+            }
+        },
         "model.Info": {
             "type": "object",
             "properties": {
@@ -8181,6 +8432,36 @@ const docTemplate = `{
                 }
             }
         },
+        "request.GetEmailSMSReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "sms_type"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "sms_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.GetPhoneSMSReq": {
+            "type": "object",
+            "required": [
+                "phone",
+                "sms_type"
+            ],
+            "properties": {
+                "phone": {
+                    "type": "string"
+                },
+                "sms_type": {
+                    "type": "string"
+                }
+            }
+        },
         "request.IdsReq": {
             "type": "object",
             "properties": {
@@ -8249,6 +8530,36 @@ const docTemplate = `{
                 },
                 "username": {
                     "description": "用户名",
+                    "type": "string"
+                }
+            }
+        },
+        "request.LoginOrRegisterByEmailSMSReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "sms_code"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "sms_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.LoginOrRegisterByPhoneSMSReq": {
+            "type": "object",
+            "required": [
+                "phone",
+                "sms_code"
+            ],
+            "properties": {
+                "phone": {
+                    "type": "string"
+                },
+                "sms_code": {
                     "type": "string"
                 }
             }
@@ -8568,6 +8879,20 @@ const docTemplate = `{
                 }
             }
         },
+        "response.CheckSMSRes": {
+            "type": "object",
+            "properties": {
+                "expire_sec": {
+                    "type": "integer"
+                },
+                "is_expired": {
+                    "type": "boolean"
+                },
+                "sms_code": {
+                    "type": "string"
+                }
+            }
+        },
         "response.Email": {
             "type": "object",
             "properties": {
@@ -8617,17 +8942,20 @@ const docTemplate = `{
                 }
             }
         },
-        "response.LoginResponse": {
+        "response.GetSMSRes": {
             "type": "object",
             "properties": {
-                "expiresAt": {
+                "expire_sec": {
                     "type": "integer"
                 },
-                "token": {
-                    "type": "string"
+                "is_already_send": {
+                    "type": "boolean"
                 },
-                "user": {
-                    "$ref": "#/definitions/system.SysUser"
+                "send_rest_sec": {
+                    "type": "integer"
+                },
+                "sms_code": {
+                    "type": "string"
                 }
             }
         },

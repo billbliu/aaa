@@ -156,6 +156,19 @@ definitions:
       mount-point:
         type: string
     type: object
+  config.EmailConfig:
+    properties:
+      max-client:
+        type: integer
+      smtp-email:
+        type: string
+      smtp-host:
+        type: string
+      smtp-password:
+        type: string
+      smtp-port:
+        type: string
+    type: object
   config.Excel:
     properties:
       dir:
@@ -492,6 +505,8 @@ definitions:
         type: array
       email:
         $ref: '#/definitions/github_com_flipped-aurora_gin-vue-admin_server_config.Email'
+      emailconfig:
+        $ref: '#/definitions/config.EmailConfig'
       excel:
         $ref: '#/definitions/config.Excel'
       hua-wei-obs:
@@ -626,6 +641,8 @@ definitions:
         type: integer
       db-type:
         description: 数据库类型:mysql(默认)|sqlite|sqlserver|postgresql
+        type: string
+      env:
         type: string
       iplimit-count:
         type: integer
@@ -811,6 +828,15 @@ definitions:
         description: 收件人:多个以英文逗号分隔 例：a@qq.com b@qq.com 正式开发中请把此项目作为参数使用
         type: string
     type: object
+  github_com_flipped-aurora_gin-vue-admin_server_model_system_response.LoginResponse:
+    properties:
+      expiresAt:
+        type: integer
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/system.SysUser'
+    type: object
   model.Info:
     properties:
       ID:
@@ -912,6 +938,26 @@ definitions:
         description: 主键ID
         type: integer
     type: object
+  request.GetEmailSMSReq:
+    properties:
+      email:
+        type: string
+      sms_type:
+        type: string
+    required:
+    - email
+    - sms_type
+    type: object
+  request.GetPhoneSMSReq:
+    properties:
+      phone:
+        type: string
+      sms_type:
+        type: string
+    required:
+    - phone
+    - sms_type
+    type: object
   request.IdsReq:
     properties:
       ids:
@@ -962,6 +1008,26 @@ definitions:
       username:
         description: 用户名
         type: string
+    type: object
+  request.LoginOrRegisterByEmailSMSReq:
+    properties:
+      email:
+        type: string
+      sms_code:
+        type: string
+    required:
+    - email
+    - sms_code
+    type: object
+  request.LoginOrRegisterByPhoneSMSReq:
+    properties:
+      phone:
+        type: string
+      sms_code:
+        type: string
+    required:
+    - phone
+    - sms_code
     type: object
   request.ModeBindingCategoryWebsitesReq:
     properties:
@@ -1182,6 +1248,15 @@ definitions:
       url:
         type: string
     type: object
+  response.CheckSMSRes:
+    properties:
+      expire_sec:
+        type: integer
+      is_expired:
+        type: boolean
+      sms_code:
+        type: string
+    type: object
   response.Email:
     properties:
       body:
@@ -1214,14 +1289,16 @@ definitions:
       file:
         $ref: '#/definitions/example.ExaFile'
     type: object
-  response.LoginResponse:
+  response.GetSMSRes:
     properties:
-      expiresAt:
+      expire_sec:
         type: integer
-      token:
+      is_already_send:
+        type: boolean
+      send_rest_sec:
+        type: integer
+      sms_code:
         type: string
-      user:
-        $ref: '#/definitions/system.SysUser'
     type: object
   response.PageResult:
     properties:
@@ -2768,6 +2845,34 @@ paths:
       summary: 回滚自动生成代码
       tags:
       - AutoCode
+  /base/GetPhoneSMS:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 手机和验证码类型
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetPhoneSMSReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取手机验证码
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.GetSMSRes'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取手机验证码
+      tags:
+      - BusBaseApi
   /base/captcha:
     post:
       consumes:
@@ -2791,6 +2896,34 @@ paths:
       summary: 生成验证码
       tags:
       - Base
+  /base/getEmailSMS:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 邮箱和验证码类型
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetEmailSMSReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取邮箱验证码
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.GetSMSRes'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取邮箱验证码
+      tags:
+      - BusBaseApi
   /base/login:
     post:
       parameters:
@@ -2810,13 +2943,69 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/response.LoginResponse'
+                  $ref: '#/definitions/github_com_flipped-aurora_gin-vue-admin_server_model_system_response.LoginResponse'
                 msg:
                   type: string
               type: object
       summary: 用户登录
       tags:
       - Base
+  /base/loginOrRegisterByEmailSMS:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 邮箱验证码参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginOrRegisterByEmailSMSReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 通过邮箱登录或注册
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CheckSMSRes'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 通过邮箱登录或注册
+      tags:
+      - BusBaseApi
+  /base/loginOrRegisterByPhoneSMS:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 手机验证码
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginOrRegisterByPhoneSMSReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 检查手机验证码
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CheckSMSRes'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 通过手机登录或注册
+      tags:
+      - BusBaseApi
   /casbin/UpdateCasbin:
     post:
       consumes:
@@ -3943,6 +4132,13 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: ID
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.GetById'
       produces:
       - application/json
       responses:

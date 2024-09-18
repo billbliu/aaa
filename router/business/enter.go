@@ -7,6 +7,7 @@ type RouterGroup struct {
 	WebsiteCategoryRouter
 	ModeRouter
 	BaseRouter
+	CustomerAssetRouter
 }
 
 var (
@@ -14,4 +15,5 @@ var (
 	busWebsiteCategoryApi = api.ApiGroupApp.BusinessApiGroup.BusWebsiteCategoryApi
 	busModeApi            = api.ApiGroupApp.BusinessApiGroup.BusModeApi
 	busBaseApi            = api.ApiGroupApp.BusinessApiGroup.BusBaseApi
+	busCustomerAssetApi   = api.ApiGroupApp.BusinessApiGroup.BusCustomerAssetApi
 )

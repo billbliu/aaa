@@ -36,7 +36,8 @@ var (
 	BlackCache              local_cache.Cache
 	lock                    sync.RWMutex
 
-	EmailPool *email.Pool
+	EmailPool     *email.Pool
+	PaymentClient *UserPaymentClient
 )
 
 // GetGlobalDBByDBName 通过名称获取db list中的db

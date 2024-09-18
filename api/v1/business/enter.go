@@ -7,6 +7,7 @@ type ApiGroup struct {
 	BusWebsiteCategoryApi
 	BusModeApi
 	BusBaseApi
+	BusCustomerAssetApi
 }
 
 var (
@@ -14,4 +15,5 @@ var (
 	websiteCategoryService = service.ServiceGroupApp.BusinessServiceGroup.WebsiteCategoryService
 	modeService            = service.ServiceGroupApp.BusinessServiceGroup.ModeService
 	baseService            = service.ServiceGroupApp.BusinessServiceGroup.BaseService
+	customerAssetService   = service.ServiceGroupApp.BusinessServiceGroup.CustomerAssetService
 )

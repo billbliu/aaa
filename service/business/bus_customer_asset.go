@@ -216,8 +216,8 @@ func (ser *CustomerAssetService) mallOrderClearing(fromUserId uint, toUserId uin
 	return nil
 }
 
-// 官方文档：https://opendocs.alipay.com/open/59da99d0_alipay.trade.page.pay?scene=22&pathHash=e26b497f
-// 帮助中心：https://opensupport.alipay.com/support/FAQ/7f842919-f1bd-47d9-89a7-c443134b79ea
+// 官方文档：https://opendocs.alipay.com/open/203/105288?pathHash=f2308e24
+// 帮助中心：https://opensupport.alipay.com/support/FAQ
 // DepositByAlipay 用户通过支付宝充值
 func (ser *CustomerAssetService) DepositByAlipay(ctx *gin.Context, req *request.DepositByAlipayReq, customerId uint) (*response.DepositByAlipayRes, error) {
 	// 查找订单是否存在
@@ -225,7 +225,7 @@ func (ser *CustomerAssetService) DepositByAlipay(ctx *gin.Context, req *request.
 	if err == nil && orderInfo.Status == business.PAY_STATUS_NOPAY { // 已经存在订单并且未完成支付
 		res := response.DepositByAlipayRes{
 			OutTradeNo: orderInfo.OrderNo,
-			QrCode:     orderInfo.CodeUrl,
+			PayUrl:     orderInfo.PayUrl,
 		}
 		return &res, nil
 	}
@@ -241,7 +241,7 @@ func (ser *CustomerAssetService) DepositByAlipay(ctx *gin.Context, req *request.
 		PaymentType:   business.PAY_ALIPAY,
 		BusCustomerId: customerId,
 		Amount:        decimal.NewFromFloat(req.Money),
-		CodeUrl:       "",
+		PayUrl:        "",
 		Status:        business.PAY_STATUS_NOPAY,
 	}
 	if err := global.GVA_DB.Clauses(clause.OnConflict{
@@ -259,33 +259,29 @@ func (ser *CustomerAssetService) DepositByAlipay(ctx *gin.Context, req *request.
 	bm.Set("subject", fmt.Sprintf("%s-%s", global.GVA_CONFIG.PayPlatform.Title, "充值")).
 		Set("out_trade_no", tradeNo).
 		Set("total_amount", req.Money).
-		Set("time_expire", expire)
+		Set("time_expire", expire).
+		Set("product_code", "QUICK_WAP_WAY").
+		Set("quit_url", "https://www.google.com")
 	// Set("product_code", "FAST_INSTANT_TRADE_PAY")
 	// Set("notify_url", fmt.Sprintf("%s%s", global.GVA_CONFIG.PayPlatform.Alipay.NotifyUrl, "/api/v1/mall/asset/deposit/alipay/notify"))
 	// Set("return_url", fmt.Sprintf("%s%s", global.GVA_CONFIG.PayPlatform.Alipay.ReturnUrl, "/api/v1/mall/asset/deposit/alipay/notify"))
 
-	log.Println("nurl:", bm.JsonBody())
-	log.Println("nurl:", global.PaymentClient.Alipay.NotifyUrl)
-
 	// 发起支付
-	aliRsp, err := global.PaymentClient.Alipay.TradePrecreate(ctx, bm)
+	payUrl, err := global.PaymentClient.Alipay.TradeWapPay(ctx, bm)
 	if err != nil {
-		if bizError, ok := alipay.IsBizError(err); ok {
-			xlog.Errorf("s.alipay.TradePrecreate(%v), bizError:%v", bm, bizError)
-			return nil, errors.New(bizError.SubMsg)
-		}
+		xlog.Errorf("client.TradeWapPay(%+v),error:%+v", bm, err)
 		return nil, err
 	}
 
 	// 更新付款链接
-	if err := global.GVA_DB.Model(&newOrder).Update("code_url", aliRsp.Response.QrCode).Error; err != nil {
+	if err := global.GVA_DB.Model(&newOrder).Update("pay_url", payUrl).Error; err != nil {
 		global.GVA_LOG.Error(err.Error())
 	}
 
 	// return
 	res := response.DepositByAlipayRes{
-		OutTradeNo: aliRsp.Response.OutTradeNo,
-		QrCode:     aliRsp.Response.QrCode,
+		OutTradeNo: tradeNo,
+		PayUrl:     payUrl,
 	}
 	return &res, nil
 }
@@ -383,7 +379,7 @@ func (ser *CustomerAssetService) DepositByWxpay(ctx *gin.Context, req *request.D
 	if err == nil && orderInfo.Status == business.PAY_STATUS_NOPAY { // 已经存在订单并且未完成支付
 		res := response.DepositByWxpayRes{
 			OutTradeNo: orderInfo.OrderNo,
-			QrCode:     orderInfo.CodeUrl,
+			QrCode:     orderInfo.PayUrl,
 		}
 		return &res, nil
 	}
@@ -399,7 +395,7 @@ func (ser *CustomerAssetService) DepositByWxpay(ctx *gin.Context, req *request.D
 		PaymentType:   business.PAY_WECHAT,
 		BusCustomerId: customerId,
 		Amount:        decimal.NewFromFloat(req.Money),
-		CodeUrl:       "",
+		PayUrl:        "",
 		Status:        business.PAY_STATUS_NOPAY,
 	}
 	if err := global.GVA_DB.Create(&newOrder).Error; err != nil {
@@ -413,12 +409,20 @@ func (ser *CustomerAssetService) DepositByWxpay(ctx *gin.Context, req *request.D
 		Set("description", fmt.Sprintf("%s-%s", global.GVA_CONFIG.PayPlatform.Title, "充值")).
 		Set("out_trade_no", tradeNo).
 		Set("time_expire", expire).
-		Set("notify_url", fmt.Sprintf("%s%s", global.GVA_CONFIG.System.Domain, "/api/v1/mall/asset/deposit/wxpay/notify")).
-		SetBodyMap("amount", func(bm gopay.BodyMap) {
-			bm.Set("total", req.Money).Set("currency", "CNY")
+		Set("notify_url", fmt.Sprintf("%s%s", global.GVA_CONFIG.System.Domain, "/customer/asset/deposit/wxpay/notify")).
+		SetBodyMap("amount", func(b gopay.BodyMap) {
+			b.Set("total", req.Money).Set("currency", "CNY")
+		}).
+		SetBodyMap("scene_info", func(b gopay.BodyMap) {
+			b.SetBodyMap("h5_info", func(b gopay.BodyMap) {
+				b.Set("type", "Wap").
+					Set("app_name", "王者荣耀").
+					Set("app_url", "https://pay.qq.com").
+					Set("bundle_id", "com.tencent.wzryiOS")
+			})
 		})
 	// 发起支付
-	wxRsp, err := global.PaymentClient.Wxpay.V3TransactionNative(ctx, bm)
+	wxRsp, err := global.PaymentClient.Wxpay.V3TransactionH5(ctx, bm)
 	xlog.Error("wxRsp:", wxRsp)
 	if err != nil {
 		xlog.Error(err)
@@ -430,7 +434,7 @@ func (ser *CustomerAssetService) DepositByWxpay(ctx *gin.Context, req *request.D
 	}
 
 	// 更新付款链接
-	if err := global.GVA_DB.Model(&newOrder).Update("code_url", wxRsp.Response.CodeUrl).Error; err != nil {
+	if err := global.GVA_DB.Model(&newOrder).Update("pay_url", wxRsp.Response.H5Url).Error; err != nil {
 		global.GVA_LOG.Error(err.Error())
 	}
 
@@ -439,10 +443,87 @@ func (ser *CustomerAssetService) DepositByWxpay(ctx *gin.Context, req *request.D
 	// return
 	res := response.DepositByWxpayRes{
 		OutTradeNo: tradeNo,
-		QrCode:     wxRsp.Response.CodeUrl,
+		QrCode:     wxRsp.Response.H5Url,
 	}
 	return &res, nil
 }
+
+// DepositByWxpay 用户通过微信充值
+// func (ser *CustomerAssetService) DepositByWxpay(ctx *gin.Context, req *request.DepositByWxpayReq, customerId uint) (*response.DepositByWxpayRes, error) {
+// 	// 订单金额不能超过限制
+// 	if req.Money <= 0 {
+// 		return nil, errors.New("订单金额必须大于0")
+// 	}
+
+// 	if req.Money > 100000000 {
+// 		return nil, errors.New("订单金额超过限制, 最大100000000!")
+// 	}
+
+// 	// 查找订单是否存在
+// 	orderInfo, err := business.BusCustomerDepositOrderDao.GetCustomerDepositOrderByUuid(global.GVA_DB, req.Uuid)
+// 	if err == nil && orderInfo.Status == business.PAY_STATUS_NOPAY { // 已经存在订单并且未完成支付
+// 		res := response.DepositByWxpayRes{
+// 			OutTradeNo: orderInfo.OrderNo,
+// 			QrCode:     orderInfo.PayUrl,
+// 		}
+// 		return &res, nil
+// 	}
+
+// 	// 生成商家订单号
+// 	tradeNo := strings.ReplaceAll(uuid.New().String(), "-", "")
+// 	xlog.Infof("tradeNo: %s", tradeNo)
+
+// 	// 不存在订单，生成新订单
+// 	newOrder := business.BusCustomerDepositOrder{
+// 		Uuid:          req.Uuid,
+// 		OrderNo:       tradeNo,
+// 		PaymentType:   business.PAY_WECHAT,
+// 		BusCustomerId: customerId,
+// 		Amount:        decimal.NewFromFloat(req.Money),
+// 		PayUrl:        "",
+// 		Status:        business.PAY_STATUS_NOPAY,
+// 	}
+// 	if err := global.GVA_DB.Create(&newOrder).Error; err != nil {
+// 		return nil, err
+// 	}
+
+// 	// 构造支付参数
+// 	expire := time.Now().Add(10 * time.Minute).Format(time.RFC3339)
+// 	bm := make(gopay.BodyMap)
+// 	bm.Set("appid", global.GVA_CONFIG.PayPlatform.Wechat.Appid).
+// 		Set("description", fmt.Sprintf("%s-%s", global.GVA_CONFIG.PayPlatform.Title, "充值")).
+// 		Set("out_trade_no", tradeNo).
+// 		Set("time_expire", expire).
+// 		Set("notify_url", fmt.Sprintf("%s%s", global.GVA_CONFIG.System.Domain, "/customer/asset/deposit/wxpay/notify")).
+// 		SetBodyMap("amount", func(bm gopay.BodyMap) {
+// 			bm.Set("total", req.Money).Set("currency", "CNY")
+// 		})
+// 	// 发起支付
+// 	wxRsp, err := global.PaymentClient.Wxpay.V3TransactionNative(ctx, bm)
+// 	xlog.Error("wxRsp:", wxRsp)
+// 	if err != nil {
+// 		xlog.Error(err)
+// 		return nil, err
+// 	}
+
+// 	if wxRsp.Code != wechat.Success {
+// 		return nil, errors.New("调用微信支付接口失败")
+// 	}
+
+// 	// 更新付款链接
+// 	if err := global.GVA_DB.Model(&newOrder).Update("pay_url", wxRsp.Response.CodeUrl).Error; err != nil {
+// 		global.GVA_LOG.Error(err.Error())
+// 	}
+
+// 	// 总账号冻结订单金额
+
+// 	// return
+// 	res := response.DepositByWxpayRes{
+// 		OutTradeNo: tradeNo,
+// 		QrCode:     wxRsp.Response.CodeUrl,
+// 	}
+// 	return &res, nil
+// }
 
 // DepositByWxpayNotify 用户通过微信充值回调通知
 // 只有TRADE_SUCCESS 支付成功才会触发这个通知

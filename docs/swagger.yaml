@@ -47,6 +47,25 @@ definitions:
         description: 更新时间
         type: string
     type: object
+  config.Alipay:
+    properties:
+      alipayPublicCertContent:
+        type: string
+      alipayRootCertContent:
+        type: string
+      appPublicCertContent:
+        type: string
+      appid:
+        type: string
+      contentKey:
+        type: string
+      mode:
+        type: string
+      openid:
+        type: string
+      privateKey:
+        type: string
+    type: object
   config.AliyunOSS:
     properties:
       access-key-id:
@@ -390,6 +409,15 @@ definitions:
         description: 数据库账号
         type: string
     type: object
+  config.PayPlatform:
+    properties:
+      alipay:
+        $ref: '#/definitions/config.Alipay'
+      title:
+        type: string
+      wechat:
+        $ref: '#/definitions/config.WechatPay'
+    type: object
   config.Pgsql:
     properties:
       config:
@@ -527,6 +555,8 @@ definitions:
         description: gorm
       oracle:
         $ref: '#/definitions/config.Oracle'
+      payPlatform:
+        $ref: '#/definitions/config.PayPlatform'
       pgsql:
         $ref: '#/definitions/config.Pgsql'
       qiniu:
@@ -642,6 +672,8 @@ definitions:
       db-type:
         description: 数据库类型:mysql(默认)|sqlite|sqlserver|postgresql
         type: string
+      domain:
+        type: string
       env:
         type: string
       iplimit-count:
@@ -676,6 +708,21 @@ definitions:
       secret-id:
         type: string
       secret-key:
+        type: string
+    type: object
+  config.WechatPay:
+    properties:
+      apiKey:
+        type: string
+      apiV3Key:
+        type: string
+      appid:
+        type: string
+      mchId:
+        type: string
+      mchSerialNo:
+        type: string
+      privateKeyContent:
         type: string
     type: object
   config.Zap:
@@ -922,6 +969,22 @@ definitions:
       title:
         type: string
       url:
+        type: string
+    type: object
+  request.DepositByAlipayReq:
+    properties:
+      money:
+        description: 元
+        type: number
+      uuid:
+        type: string
+    type: object
+  request.DepositByWxpayReq:
+    properties:
+      money:
+        description: 元
+        type: number
+      uuid:
         type: string
     type: object
   request.Empty:
@@ -1255,6 +1318,24 @@ definitions:
       is_expired:
         type: boolean
       sms_code:
+        type: string
+    type: object
+  response.CustomerAssetGetRes:
+    properties:
+      Avail:
+        type: number
+      freeze:
+        type: number
+      total:
+        type: number
+    type: object
+  response.DepositByAlipayRes:
+    properties:
+      out_trade_no:
+        description: 商家订单号
+        type: string
+      qr_code:
+        description: 支付链接
         type: string
     type: object
   response.Email:
@@ -3064,6 +3145,164 @@ paths:
       summary: 获取权限列表
       tags:
       - Casbin
+  /customer/asset/bill:
+    get:
+      description: 获取JSON
+      parameters:
+      - description: 行为 1:充值、2:会员购买
+        in: query
+        name: behavior
+        type: integer
+      - description: 页条数
+        in: query
+        name: pageSize
+        type: integer
+      - description: 页码
+        in: query
+        name: pageIndex
+        type: integer
+      responses:
+        "200":
+          description: 用户资产账单
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CustomerAssetGetRes'
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取用户资产账单信息
+      tags:
+      - 用户中心-资产
+  /customer/asset/deposit/alipay:
+    post:
+      consumes:
+      - application/json
+      description: 获取JSON
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DepositByAlipayReq'
+      responses:
+        "200":
+          description: 支付宝充值
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.DepositByAlipayRes'
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 资产充值-支付宝
+      tags:
+      - 用户中心-资产
+  /customer/asset/deposit/alipay/notify:
+    post:
+      consumes:
+      - application/json
+      description: 获取JSON
+      responses:
+        "200":
+          description: 用户资产
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      summary: 资产充值-支付宝(回调通知)
+      tags:
+      - 用户中心-资产
+  /customer/asset/deposit/order/status:
+    get:
+      consumes:
+      - application/json
+      description: 获取JSON
+      parameters:
+      - description: 商家订单编号
+        in: query
+        name: out_trade_no
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code": 200, "data": ""}'
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 资产充值-查询充值订单状态
+      tags:
+      - 用户中心-资产
+  /customer/asset/deposit/wxpay:
+    post:
+      consumes:
+      - application/json
+      description: 获取JSON
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/request.DepositByWxpayReq'
+      responses:
+        "200":
+          description: '{"code": 200, "data": [...]}'
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: 资产充值-微信
+      tags:
+      - 用户中心-资产
+  /customer/asset/deposit/wxpay/notify:
+    post:
+      consumes:
+      - application/json
+      description: 获取JSON
+      responses:
+        "200":
+          description: '{"code": 200, "data": [...]}'
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 资产充值-微信(回调通知)
+      tags:
+      - 用户中心-资产
+  /customer/asset/my:
+    get:
+      description: 获取JSON
+      responses:
+        "200":
+          description: 用户资产
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.CustomerAssetGetRes'
+                msg:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 获取用户资产信息
+      tags:
+      - 用户中心-资产
   /customer/customer:
     delete:
       consumes:

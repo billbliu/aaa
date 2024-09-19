@@ -63,6 +63,7 @@ func Routers() *gin.Engine {
 
 	PublicGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
 	PrivateGroup := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
+	PrivateGroup1 := Router.Group(global.GVA_CONFIG.System.RouterPrefix)
 
 	PrivateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
 
@@ -80,6 +81,8 @@ func Routers() *gin.Engine {
 		businessRouter.InitWebsiteCategoryRouter(PublicGroup)
 		businessRouter.InitModeRouter(PublicGroup)
 		businessRouter.InitBaseRouter(PublicGroup)
+
+		businessRouter.InitCustomerAssetPublicRouter(PublicGroup)
 	}
 
 	{
@@ -99,6 +102,8 @@ func Routers() *gin.Engine {
 		systemRouter.InitSysExportTemplateRouter(PrivateGroup)      // 导出模板
 		exampleRouter.InitCustomerRouter(PrivateGroup)              // 客户路由
 		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
+
+		businessRouter.InitCustomerAssetPrivateRouter(PrivateGroup1)
 
 	}
 

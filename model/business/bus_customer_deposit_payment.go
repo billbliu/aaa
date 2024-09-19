@@ -13,7 +13,7 @@ type BusCustomerDepositPayment struct {
 	TradeType     string          `gorm:"column:trade_type;comment:交易类型" db:"trade_type" json:"trade_type" form:"trade_type"`
 	TradeState    string          `gorm:"column:trade_state;comment:交易状态" db:"trade_state" json:"trade_state" form:"trade_state"`
 	Amount        decimal.Decimal `gorm:"column:amount;type:decimal(12,2);comment:支付金额" db:"amount" json:"amount"  form:"amount"`
-	Content       string          `gorm:"column:content;comment:通知参数" db:"content" json:"content" form:"content"`
+	Content       string          `gorm:"column:content;type:text;comment:通知参数" db:"content" json:"content" form:"content"`
 }
 
 func (t *BusCustomerDepositPayment) TableName() string {

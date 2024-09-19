@@ -34,5 +34,5 @@ type Server struct {
 	Cors CORS `mapstructure:"cors" json:"cors" yaml:"cors"`
 
 	EmailConfig EmailConfig `mapstructure:"emailconfig" json:"emailconfig" yaml:"emailconfig"`
-	PayPlatform Payment
+	PayPlatform PayPlatform `mapstructure:"payPlatform" json:"payPlatform" yaml:"payPlatform"`
 }

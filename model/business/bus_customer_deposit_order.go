@@ -33,7 +33,7 @@ type BusCustomerDepositOrder struct {
 	PaymentType   PayType           `gorm:"column:payment_type;comment:支付类型" db:"payment_type" json:"payment_type" form:"payment_type"`
 	BusCustomerId uint              `gorm:"column:bus_customer_id;comment:客户ID" db:"bus_customer_id"  json:"bus_customer_id" form:"bus_customer_id"`
 	Amount        decimal.Decimal   `gorm:"column:amount;type:decimal(12,2);comment:订单金额" db:"amount" json:"amount"  form:"amount"`
-	CodeUrl       string            `gorm:"column:code_url;comment:订单二维码链接" db:"code_url" json:"code_url" form:"code_url"`
+	PayUrl        string            `gorm:"column:pay_url;type:text;comment:订单二维码链接" db:"pay_url" json:"pay_url" form:"pay_url"`
 	Status        DepositStatusType `gorm:"column:status;comment:订单状态: 0未支付、1已支付、2交易关闭" db:"status" json:"status"  form:"status"`
 }
 

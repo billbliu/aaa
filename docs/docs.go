@@ -2151,6 +2151,276 @@ const docTemplate = `{
                 }
             }
         },
+        "/customer/asset/bill": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "用户中心-资产"
+                ],
+                "summary": "获取用户资产账单信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "行为 1:充值、2:会员购买",
+                        "name": "behavior",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页条数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "pageIndex",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "用户资产账单",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CustomerAssetGetRes"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/asset/deposit/alipay": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户中心-资产"
+                ],
+                "summary": "资产充值-支付宝",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DepositByAlipayReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "支付宝充值",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.DepositByAlipayRes"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/asset/deposit/alipay/notify": {
+            "post": {
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户中心-资产"
+                ],
+                "summary": "资产充值-支付宝(回调通知)",
+                "responses": {
+                    "200": {
+                        "description": "用户资产",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/asset/deposit/order/status": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户中心-资产"
+                ],
+                "summary": "资产充值-查询充值订单状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "商家订单编号",
+                        "name": "out_trade_no",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 200, \"data\": \"\"}",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/asset/deposit/wxpay": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户中心-资产"
+                ],
+                "summary": "资产充值-微信",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DepositByWxpayReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 200, \"data\": [...]}",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/asset/deposit/wxpay/notify": {
+            "post": {
+                "description": "获取JSON",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户中心-资产"
+                ],
+                "summary": "资产充值-微信(回调通知)",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 200, \"data\": [...]}",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/asset/my": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取JSON",
+                "tags": [
+                    "用户中心-资产"
+                ],
+                "summary": "获取用户资产信息",
+                "responses": {
+                    "200": {
+                        "description": "用户资产",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.CustomerAssetGetRes"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/customer/customer": {
             "get": {
                 "security": [
@@ -7153,6 +7423,35 @@ const docTemplate = `{
                 }
             }
         },
+        "config.Alipay": {
+            "type": "object",
+            "properties": {
+                "alipayPublicCertContent": {
+                    "type": "string"
+                },
+                "alipayRootCertContent": {
+                    "type": "string"
+                },
+                "appPublicCertContent": {
+                    "type": "string"
+                },
+                "appid": {
+                    "type": "string"
+                },
+                "contentKey": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string"
+                },
+                "openid": {
+                    "type": "string"
+                },
+                "privateKey": {
+                    "type": "string"
+                }
+            }
+        },
         "config.AliyunOSS": {
             "type": "object",
             "properties": {
@@ -7643,6 +7942,20 @@ const docTemplate = `{
                 }
             }
         },
+        "config.PayPlatform": {
+            "type": "object",
+            "properties": {
+                "alipay": {
+                    "$ref": "#/definitions/config.Alipay"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "wechat": {
+                    "$ref": "#/definitions/config.WechatPay"
+                }
+            }
+        },
         "config.Pgsql": {
             "type": "object",
             "properties": {
@@ -7845,6 +8158,9 @@ const docTemplate = `{
                 "oracle": {
                     "$ref": "#/definitions/config.Oracle"
                 },
+                "payPlatform": {
+                    "$ref": "#/definitions/config.PayPlatform"
+                },
                 "pgsql": {
                     "$ref": "#/definitions/config.Pgsql"
                 },
@@ -8004,6 +8320,9 @@ const docTemplate = `{
                     "description": "数据库类型:mysql(默认)|sqlite|sqlserver|postgresql",
                     "type": "string"
                 },
+                "domain": {
+                    "type": "string"
+                },
                 "env": {
                     "type": "string"
                 },
@@ -8053,6 +8372,29 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "secret-key": {
+                    "type": "string"
+                }
+            }
+        },
+        "config.WechatPay": {
+            "type": "object",
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                },
+                "apiV3Key": {
+                    "type": "string"
+                },
+                "appid": {
+                    "type": "string"
+                },
+                "mchId": {
+                    "type": "string"
+                },
+                "mchSerialNo": {
+                    "type": "string"
+                },
+                "privateKeyContent": {
                     "type": "string"
                 }
             }
@@ -8407,6 +8749,30 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.DepositByAlipayReq": {
+            "type": "object",
+            "properties": {
+                "money": {
+                    "description": "元",
+                    "type": "number"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.DepositByWxpayReq": {
+            "type": "object",
+            "properties": {
+                "money": {
+                    "description": "元",
+                    "type": "number"
+                },
+                "uuid": {
                     "type": "string"
                 }
             }
@@ -8889,6 +9255,33 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "sms_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CustomerAssetGetRes": {
+            "type": "object",
+            "properties": {
+                "Avail": {
+                    "type": "number"
+                },
+                "freeze": {
+                    "type": "number"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "response.DepositByAlipayRes": {
+            "type": "object",
+            "properties": {
+                "out_trade_no": {
+                    "description": "商家订单号",
+                    "type": "string"
+                },
+                "qr_code": {
+                    "description": "支付链接",
                     "type": "string"
                 }
             }

@@ -18,9 +18,9 @@ type BusCustomerAssetApi struct{}
 // @Summary 获取用户资产信息
 // @Description 获取JSON
 // @Tags 用户中心-资产
-// @Success 200 {object} response.Response "{"code": 200, "data": {...}}"
-// @Router /api/v1/mall/asset/my [get]
-// @Security Bearer
+// @Success 200 {object} response.Response{data=BusResponse.CustomerAssetGetRes,msg=string} "用户资产"
+// @Router /customer/asset/my [get]
+// @Security  ApiKeyAuth
 func (api BusCustomerAssetApi) GetCustomerAsset(c *gin.Context) {
 	uid := utils.GetUserID(c)
 	res, err := customerAssetService.GetCustomerAsset(uid)
@@ -40,9 +40,9 @@ func (api BusCustomerAssetApi) GetCustomerAsset(c *gin.Context) {
 // @Param behavior query int false "行为 1:充值、2:会员购买"
 // @Param pageSize query int false "页条数"
 // @Param pageIndex query int false "页码"
-// @Success 200 {object} response.Response "{"code": 200, "data": {...}}"
-// @Router /api/v1/mall/asset/bill [get]
-// @Security Bearer
+// @Success 200 {object} response.Response{data=BusResponse.CustomerAssetGetRes,msg=string} "用户资产账单"
+// @Router /customer/asset/bill [get]
+// @Security  ApiKeyAuth
 func (api BusCustomerAssetApi) GetCustomerAssetBill(c *gin.Context) {
 	req := request.CustomerAssetBillGetReq{}
 	err := c.ShouldBindJSON(&req)
@@ -73,10 +73,10 @@ func (api BusCustomerAssetApi) GetCustomerAssetBill(c *gin.Context) {
 // @Tags 用户中心-资产
 // @Accept  application/json
 // @Product application/json
-// @Param data body dto.DepositByAlipayReq true "data"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
-// @Router /api/v1/mall/asset/deposit/alipay [post]
-// @Security Bearer
+// @Param data body request.DepositByAlipayReq true "data"
+// @Success 200 {object} response.Response{data=BusResponse.DepositByAlipayRes,msg=string} "支付宝充值"
+// @Router /customer/asset/deposit/alipay [post]
+// @Security  ApiKeyAuth
 func (api BusCustomerAssetApi) DepositByAlipay(c *gin.Context) {
 	req := request.DepositByAlipayReq{}
 	err := c.ShouldBindJSON(&req)
@@ -102,10 +102,8 @@ func (api BusCustomerAssetApi) DepositByAlipay(c *gin.Context) {
 // @Tags 用户中心-资产
 // @Accept  application/json
 // @Product application/json
-// @Param data body dto.DepositByAlipayNotifyReq true "data"
-// @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
-// @Router /api/v1/mall/asset/deposit/alipay/notify [post]
-// @Security Bearer
+// @Success 200 {object}  response.Response{data=string,msg=string} "用户资产"
+// @Router /customer/asset/deposit/alipay/notify [post]
 func (api BusCustomerAssetApi) DepositByAlipayNotify(c *gin.Context) {
 	res := customerAssetService.DepositByAlipayNotify(c)
 	response.OkWithData(res, c)
@@ -117,10 +115,10 @@ func (api BusCustomerAssetApi) DepositByAlipayNotify(c *gin.Context) {
 // @Tags 用户中心-资产
 // @Accept  application/json
 // @Product application/json
-// @Param data body dto.DepositByWxpayReq true "data"
+// @Param data body request.DepositByWxpayReq true "data"
 // @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
-// @Router /api/v1/mall/asset/deposit/wxpay [post]
-// @Security Bearer
+// @Router /customer/asset/deposit/wxpay [post]
+// @Security  ApiKeyAuth
 func (api BusCustomerAssetApi) DepositByWxpay(c *gin.Context) {
 	req := request.DepositByWxpayReq{}
 	err := c.ShouldBindJSON(&req)
@@ -146,10 +144,8 @@ func (api BusCustomerAssetApi) DepositByWxpay(c *gin.Context) {
 // @Tags 用户中心-资产
 // @Accept  application/json
 // @Product application/json
-// @Param data body dto.DepositByWxpayNotifyReq true "data"
 // @Success 200 {object} response.Response "{"code": 200, "data": [...]}"
-// @Router /api/v1/mall/asset/deposit/wxpay/notify [post]
-// @Security Bearer
+// @Router /customer/asset/deposit/wxpay/notify [post]
 func (api BusCustomerAssetApi) DepositByWxpayNotify(c *gin.Context) {
 	res, err := customerAssetService.DepositByWxpayNotify(c)
 	if err != nil {
@@ -168,8 +164,8 @@ func (api BusCustomerAssetApi) DepositByWxpayNotify(c *gin.Context) {
 // @Product application/json
 // @Param out_trade_no query string true "商家订单编号"
 // @Success 200 {object} response.Response "{"code": 200, "data": ""}"
-// @Router /api/v1/mall/asset/deposit/order/status [get]
-// @Security Bearer
+// @Router /customer/asset/deposit/order/status [get]
+// @Security  ApiKeyAuth
 func (api BusCustomerAssetApi) GetDepositOrderStatus(c *gin.Context) {
 	req := request.DepositOrderStatusReq{}
 	err := c.ShouldBindQuery(&req)

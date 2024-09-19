@@ -17,7 +17,7 @@ func (s *CustomerAssetRouter) InitCustomerAssetPrivateRouter(Router *gin.RouterG
 }
 
 func (s *CustomerAssetRouter) InitCustomerAssetPublicRouter(Router *gin.RouterGroup) {
-	apiRouter := Router.Group("CustomerAsset")
+	apiRouter := Router.Group("customer/asset")
 
 	apiRouter.POST("/deposit/alipay/notify", busCustomerAssetApi.DepositByAlipayNotify)
 	apiRouter.POST("/deposit/wxpay/notify", busCustomerAssetApi.DepositByWxpayNotify)

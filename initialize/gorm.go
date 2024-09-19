@@ -60,6 +60,13 @@ func RegisterTables() {
 		business.BusWebsiteCategory{},
 		business.BusMode{},
 		business.BusModeCategoryWebsite{},
+
+		business.BusCustomer{},
+		business.BusCustomerAsset{},
+		business.BusCustomerAssetBill{},
+		business.BusCustomerDepositOrder{},
+		business.BusCustomerDepositPayRecord{},
+		business.BusCustomerDepositPayment{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))

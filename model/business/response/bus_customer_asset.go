@@ -26,7 +26,7 @@ type CustomerAssetBillGetRes struct {
 
 type DepositByAlipayRes struct {
 	OutTradeNo string `json:"out_trade_no"` // 商家订单号
-	QrCode     string `json:"qr_code"`      // 支付链接
+	PayUrl     string `json:"pay_url"`      // 支付链接
 }
 
 type DepositByWxpayRes struct {

@@ -8,6 +8,7 @@ type RouterGroup struct {
 	ModeRouter
 	BaseRouter
 	CustomerAssetRouter
+	AdRouter
 }
 
 var (
@@ -16,4 +17,5 @@ var (
 	busModeApi            = api.ApiGroupApp.BusinessApiGroup.BusModeApi
 	busBaseApi            = api.ApiGroupApp.BusinessApiGroup.BusBaseApi
 	busCustomerAssetApi   = api.ApiGroupApp.BusinessApiGroup.BusCustomerAssetApi
+	busAdApi              = api.ApiGroupApp.BusinessApiGroup.BusAdApi
 )
